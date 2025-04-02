@@ -25,17 +25,19 @@
                 <Button x:Name="ButtonMaximize" FontFamily="Segoe MDL2 Assets" Content="&#xE922;" Width="40" Height="30" Click="MaximizeButton_Click" Foreground="White" Background="Transparent" BorderBrush="Transparent" FontSize="18" Padding="0"/>
                 <Button x:Name="ButtonClose" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Width="40" Height="30" Click="CloseButton_Click" Foreground="White" Background="Transparent" BorderBrush="Transparent" FontSize="18" Padding="0"/>
             </StackPanel>
-            
+
             <Grid Margin="0,30,0,0">
                 <Grid.Background>
                     <ImageBrush ImageSource="/648305.jpg" TileMode="None"/>
                 </Grid.Background>
-                
+
                 <Button Content="Upload File" Style="{StaticResource RoundButtonStyle}" Margin="0,99,0,0" Click="Button_Click"/>
                 <Label Content="Welcome to AIRCRAFTDAR" Style="{StaticResource LabelStyle}" Foreground="Black" RenderTransformOrigin="0.433,0.901" Margin="0,26,0,0"/>
                 <Label Content="Upload image or video and scan for aircrafts" Style="{StaticResource LabelStyle}" Foreground="Black" RenderTransformOrigin="0.433,0.901" Margin="0,68,0,0" FontSize="12"/>
+                <TextBox Style="{StaticResource RoundTextBoxStyle}" Name="URLbox" Text="" FontSize="24" Foreground="Black" Margin="0,148,0,0"/>
+                <Button Content="Check Youtube" Style="{StaticResource RoundButtonStyle}" Margin="0,187,0,0" Click="Button_Click_1"/>
             </Grid>
-          
+
         </Grid>
     </Border>
 </Window>

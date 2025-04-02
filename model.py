@@ -1,7 +1,7 @@
-import os, cv2, sys
+import os, cv2, re, yt_dlp, time, socket
 from ultralytics import YOLO
 
-def process_video(path, model):
+def process_video(sock: socket.socket, path: str, model):
     cap = cv2.VideoCapture(path)
     
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -29,21 +29,57 @@ def process_video(path, model):
         
         frame_idx += 1
         progress = (frame_idx / total_frames) * 100
-
-        with open("output.txt", "w") as file:
-            file.write(f"Processing: {progress:.2f}% completed")
-
-    with open("output.txt", "w") as file:
-        file.write("")
+        sock.sendall(f"Processing: {progress:.2f}% completed".encode())
         
     cap.release()
     out.release()
     cv2.destroyAllWindows()
 
-    with open("ModelOutput/output.txt", "w") as file:
-        file.write("Processing complete.")
+    sock.sendall("Processing ended.".encode())
+    return output_video_path
 
-def process_image(path, model):
+def checkIfYoutube(sock: socket.socket, url: str, save_path="ModelOutput"):
+    if re.match(r"(https?://)?(www\.)?(youtube\.com|youtu\.be)/.+", url):
+        os.makedirs(save_path, exist_ok=True)
+
+        sock.sendall("Downloading process started.\n".encode())
+
+        output_file = os.path.join(save_path, "video.mp4")
+
+        id = 1
+        while os.path.exists(output_file):
+            output_file = os.path.join(save_path, f"video{id}.mp4")
+            id += 1
+
+        def log_progress(d):
+            per = str(d['_percent'])
+            sock.sendall((f"Downloading: {per}%").encode())
+
+        ydl_opts = {
+            "outtmpl": output_file,
+            "format": "bestvideo",
+            "quiet": True,
+            "progress_hooks": [log_progress],
+        }
+
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+            sock.sendall(("Video downloaded.").encode())
+
+            return output_file
+        
+        except PermissionError as e:
+            sock.sendall("Error" + str(e))
+            checkIfYoutube(url)
+
+        except Exception as e:
+            sock.sendall("Error" + str(e))
+
+    return ""
+
+def process_image(sock: socket.socket, path: str, model):
     img = model(cv2.imread(path))[0].plot()
     os.makedirs("ModelOutput", exist_ok=True)
 
@@ -56,16 +92,29 @@ def process_image(path, model):
         id += 1
 
     cv2.imwrite(output_image_path, img)
+    return output_image_path
 
-def main(path):
+def main():
     model = YOLO("C:\\Users\\Shaked\\Documents\\Projects\\CNN\\runs\\detect\\train\\weights\\best.pt")
     
-    if path.endswith(('.mp4', '.mov', '.avi', '.mkv')):
-        process_video(path, model)
-    else:
-        process_image(path, model)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect(("127.0.0.1", 12345))
+
+        path = sock.recv(1024).decode()
+
+        vid_path = checkIfYoutube(sock, path)
+
+        if vid_path != "":
+            path = vid_path
+
+        if path.endswith(('.mp4', '.mov', '.avi', '.mkv')):
+            path = process_video(sock, path, model)
+        else:
+            path = process_image(sock, path, model)
+
+        sock.sendall("DONE.".encode())
+        sock.send(str(os.getcwd() + "\\" + path).encode())
         
-    sys.exit(0)
 
 if __name__ == "__main__":
-    main("".join(sys.argv[1:]))
+    main()

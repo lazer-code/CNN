@@ -59,5 +59,13 @@ namespace AircraftFrontend
                 window.ShowDialog();
             }
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            string url = URLbox.Text;
+            URLbox.Text = "";
+            ViewWindow window = new(url);
+            window.ShowDialog();
+        }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,38 +75,50 @@ namespace AircraftFrontend
 
             Process process = new() { StartInfo = psi };
             process.Start();
+            
+
+            int port = 12345;
+            TcpListener server = new TcpListener(IPAddress.Any, port);
+            server.Start();
+            TcpClient client = server.AcceptTcpClient();
+            NetworkStream stream = client.GetStream();
+
+            byte[] response = Encoding.ASCII.GetBytes(path);
+            stream.Write(response, 0, response.Length);
 
             Thread thread = new(() =>
             {
-                string outputFile = "output.txt";
-
-                while (!process.HasExited)
+                while (true)
                 {
-                    if (File.Exists(outputFile))
+                    byte[] data = new byte[16384];
+                    int bytesRead = 0;
+                    StringBuilder messageBuilder = new StringBuilder();
+
+                    while ((bytesRead = stream.Read(data, 0, data.Length)) > 0)
                     {
-                        string outputText = File.ReadAllText(outputFile);
-                        Dispatcher.Invoke(() => label.Content = outputText);
+                        messageBuilder.Clear();
+                        messageBuilder.Append(Encoding.ASCII.GetString(data, 0, bytesRead));
+                        Dispatcher.Invoke(() => label.Content = messageBuilder.ToString());
+
+                        if (messageBuilder.ToString().Contains("DONE."))
+                        {
+                            Dispatcher.Invoke(() => label.Content = "");
+                            string tmp = messageBuilder.ToString().Substring(5);
+                            path = tmp;
+                        }
+                            
                     }
-                    Thread.Sleep(500);
+
+                    break;
                 }
 
-                Dispatcher.Invoke(() => LoadOutput(outpath));
+                client.Close();
+                server.Stop();
+
+                Dispatcher.Invoke(() => this.mediaElement.Source = new Uri(path));
             });
 
             thread.Start();
-        }
-
-        private void LoadOutput(string outpath)
-        {
-            string outputDir = "ModelOutput";
-
-            var latestFile = Directory.GetFiles(outputDir)
-                                        .Select(f => new FileInfo(f))
-                                        .OrderByDescending(f => f.CreationTime)
-                                        .FirstOrDefault();
-
-            mediaElement.Source = new Uri(latestFile.FullName);
-            File.Delete("output.txt");
         }
     }
 }
