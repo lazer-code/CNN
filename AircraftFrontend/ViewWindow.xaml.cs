@@ -68,7 +68,7 @@ namespace AircraftFrontend
             ProcessStartInfo psi = new()
             {
                 FileName = "python",
-                Arguments = $"{outpath}\\model.py {path}",
+                Arguments = $"model.py {path}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,

@@ -95,7 +95,7 @@ def process_image(sock: socket.socket, path: str, model):
     return output_image_path
 
 def main():
-    model = YOLO("C:\\Users\\Shaked\\Documents\\Projects\\CNN\\runs\\detect\\train\\weights\\best.pt")
+    model = YOLO("best.pt")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(("127.0.0.1", 12345))
