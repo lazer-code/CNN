@@ -402,3 +402,4 @@ FodyWeavers.xsd
 /runs/detect/train
 /yolo11n.pt
 /yolo12m.pt
+/ModelOutput

@@ -96,7 +96,7 @@ def process_image(sock: socket.socket, path: str, model):
 
 def main():
     model = YOLO("C:\\Users\\Shaked\\Documents\\Projects\\CNN\\runs\\detect\\train\\weights\\best.pt")
-    
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(("127.0.0.1", 12345))
 
@@ -112,8 +112,7 @@ def main():
         else:
             path = process_image(sock, path, model)
 
-        sock.sendall("DONE.".encode())
-        sock.send(str(os.getcwd() + "\\" + path).encode())
+        sock.sendall(("DONE." + os.getcwd() + "\\" + path).encode())
         
 
 if __name__ == "__main__":

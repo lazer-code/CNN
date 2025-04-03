@@ -8,7 +8,8 @@
         ResizeMode="CanResizeWithGrip"
         WindowStyle="None"
         AllowsTransparency="True"
-        d:Width="1200" d:Height="800">
+        d:Width="1200" d:Height="800"
+        Closing="Window_Closing">
 
     <Window.Resources>
         <ResourceDictionary Source="/Resources.xaml"/>

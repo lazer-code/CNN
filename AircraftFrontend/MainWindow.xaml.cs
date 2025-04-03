@@ -63,7 +63,14 @@ namespace AircraftFrontend
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             string url = URLbox.Text;
-            URLbox.Text = "";
+
+            if (url == "")
+            {
+                MessageBox.Show("Please enter a URL.");
+                return;
+            }
+
+            URLbox.Text = "Enter URL";
             ViewWindow window = new(url);
             window.ShowDialog();
         }

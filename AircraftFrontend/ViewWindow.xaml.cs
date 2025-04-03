@@ -24,11 +24,13 @@ namespace AircraftFrontend
     /// </summary>
     public partial class ViewWindow : Window
     {
+        private TcpListener server;
+
         public ViewWindow(string path)
         {
             InitializeComponent();
             MouseDown += MainWindow_MouseDown;
-
+            this.Closing += Window_Closing;
             RunPythonScript(path);
         }
 
@@ -78,8 +80,8 @@ namespace AircraftFrontend
             
 
             int port = 12345;
-            TcpListener server = new TcpListener(IPAddress.Any, port);
-            server.Start();
+            this.server = new TcpListener(IPAddress.Any, port);
+            this.server.Start();
             TcpClient client = server.AcceptTcpClient();
             NetworkStream stream = client.GetStream();
 
@@ -105,8 +107,7 @@ namespace AircraftFrontend
                             Dispatcher.Invoke(() => label.Content = "");
                             string tmp = messageBuilder.ToString().Substring(5);
                             path = tmp;
-                        }
-                            
+                        }    
                     }
 
                     break;
@@ -119,6 +120,11 @@ namespace AircraftFrontend
             });
 
             thread.Start();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            server.Stop();
         }
     }
 }
