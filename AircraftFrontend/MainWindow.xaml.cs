@@ -74,5 +74,10 @@ namespace AircraftFrontend
             ViewWindow window = new(url);
             window.ShowDialog();
         }
+
+        private void URLbox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.URLbox.Text = "";
+        }
     }
 }
