@@ -97,6 +97,7 @@ def process_image(sock: socket.socket, path: str, model):
 def main():
     model = YOLO("best.pt")
 
+    time.sleep(5)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(("127.0.0.1", 12345))
 

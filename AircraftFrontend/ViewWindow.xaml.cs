@@ -24,7 +24,9 @@ namespace AircraftFrontend
     /// </summary>
     public partial class ViewWindow : Window
     {
-        private TcpListener server;
+        private TcpListener? server;
+        private Thread thread;
+        private Process process;
 
         public ViewWindow(string path)
         {
@@ -57,26 +59,31 @@ namespace AircraftFrontend
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-        private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.server.Stop();
+            Close();
+        }
 
         private void RunPythonScript(string path)
         {
             string outpath = Directory.GetCurrentDirectory();
             DirectoryInfo info = Directory.GetParent(outpath).Parent.Parent.Parent;
             outpath = info.FullName;
+            string p = Directory.GetCurrentDirectory();
 
             ProcessStartInfo psi = new()
             {
                 FileName = "python",
-                Arguments = $"model.py {path}",
+                Arguments = $"model.py",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            Process process = new() { StartInfo = psi };
-            process.Start();
+            this.process = new() { StartInfo = psi };
+            this.process.Start();
             
 
             int port = 12345;
@@ -88,7 +95,7 @@ namespace AircraftFrontend
             byte[] response = Encoding.ASCII.GetBytes(path);
             stream.Write(response, 0, response.Length);
 
-            Thread thread = new(() =>
+            this.thread = new(() =>
             {
                 while (true)
                 {
@@ -124,7 +131,8 @@ namespace AircraftFrontend
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            server.Stop();
+            this.process.Close();
+            this.server.Stop();
         }
     }
 }
