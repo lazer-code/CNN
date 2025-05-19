@@ -403,5 +403,9 @@ FodyWeavers.xsd
 /yolo11n.pt
 /yolo12m.pt
 /ModelOutput
-
+/Aircrafts
+/.vs
+/bin
+/obj
+/run
 Aircrafts

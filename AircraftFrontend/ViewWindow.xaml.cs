@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection.Emit;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace AircraftFrontend
 {
@@ -25,9 +14,13 @@ namespace AircraftFrontend
     public partial class ViewWindow : Window
     {
         private TcpListener? server;
-        private Thread thread;
-        private Process process;
+        private Thread? thread;
+        private Process? process;
 
+        /// <summary>
+        /// A function which innitiates the ViewWindow window.
+        /// </summary>
+        /// <param name="path"></param>
         public ViewWindow(string path)
         {
             InitializeComponent();
@@ -36,12 +29,22 @@ namespace AircraftFrontend
             RunPythonScript(path);
         }
 
+        /// <summary>
+        /// A function which enabless window moving when the left button is being clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
                 DragMove();
         }
 
+        /// <summary>
+        /// A function which handles the maximize / demaximize the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
             if (WindowState == WindowState.Maximized)
@@ -57,30 +60,46 @@ namespace AircraftFrontend
             }
         }
 
+        /// <summary>
+        /// A function which minimizes the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
+        /// <summary>
+        /// A function which closes the window and stops the server.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.server.Stop();
+            if (this.server != null)
+                this.server.Stop();
+
             Close();
         }
 
+        /// <summary>
+        /// A function which runs the python file which predicts all the objects in pictures and videos.
+        /// </summary>
+        /// <param name="path"></param>
         private void RunPythonScript(string path)
         {
             string outpath = Directory.GetCurrentDirectory();
             DirectoryInfo info = Directory.GetParent(outpath).Parent.Parent.Parent;
             outpath = info.FullName;
-            string p = Directory.GetCurrentDirectory();
+            string modelPath = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName + "\\model.py";
 
             ProcessStartInfo psi = new()
             {
-                FileName = "python",
-                Arguments = $"model.py",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                FileName = "py",
+                Arguments = $"{modelPath} {path}",
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
+
+
 
             this.process = new() { StartInfo = psi };
             this.process.Start();
@@ -91,9 +110,7 @@ namespace AircraftFrontend
             this.server.Start();
             TcpClient client = server.AcceptTcpClient();
             NetworkStream stream = client.GetStream();
-
-            byte[] response = Encoding.ASCII.GetBytes(path);
-            stream.Write(response, 0, response.Length);
+            path = "";
 
             this.thread = new(() =>
             {
@@ -101,7 +118,7 @@ namespace AircraftFrontend
                 {
                     byte[] data = new byte[16384];
                     int bytesRead = 0;
-                    StringBuilder messageBuilder = new StringBuilder();
+                    StringBuilder messageBuilder = new();
 
                     while ((bytesRead = stream.Read(data, 0, data.Length)) > 0)
                     {
@@ -109,7 +126,7 @@ namespace AircraftFrontend
                         messageBuilder.Append(Encoding.ASCII.GetString(data, 0, bytesRead));
                         Dispatcher.Invoke(() => label.Content = messageBuilder.ToString());
 
-                        if (messageBuilder.ToString().Contains("DONE."))
+                        if (messageBuilder.ToString().StartsWith("DONE."))
                         {
                             Dispatcher.Invoke(() => label.Content = "");
                             string tmp = messageBuilder.ToString().Substring(5);
@@ -129,10 +146,18 @@ namespace AircraftFrontend
             thread.Start();
         }
 
+        /// <summary>
+        /// A function which closes the server and the python file when the window gets closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.process.Close();
-            this.server.Stop();
+            if (this.process != null)
+                this.process.Close();
+
+            if (this.server != null)
+                this.server.Stop();
         }
     }
 }

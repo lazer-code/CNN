@@ -1,15 +1,6 @@
-﻿using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
-using System.IO;
 
 namespace AircraftFrontend
 {
@@ -18,18 +9,31 @@ namespace AircraftFrontend
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// A function which innitiates the MainWindow window.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
             MouseDown += MainWindow_MouseDown;
         }
 
+        /// <summary>
+        /// A function which enabless window moving when the left button is being clicked.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
                 DragMove();
         }
 
+        /// <summary>
+        /// A function which handles the maximize / demaximize the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MaximizeButton_Click(object sender, RoutedEventArgs e)
         {
             if (WindowState == WindowState.Maximized)
@@ -45,10 +49,25 @@ namespace AircraftFrontend
             }
         }
 
+        /// <summary>
+        /// A function which minimizes the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
+        /// <summary>
+        /// A function which closes the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CloseButton_Click(object sender, RoutedEventArgs e) => Close();
 
+        /// <summary>
+        /// A function which handles local file detection option.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog();
@@ -60,6 +79,11 @@ namespace AircraftFrontend
             }
         }
 
+        /// <summary>
+        /// A function which handles YouTube video detection option.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             string url = URLbox.Text;
@@ -72,12 +96,16 @@ namespace AircraftFrontend
 
             URLbox.Text = "Enter URL";
             ViewWindow window = new(url);
+            window.Closed += (sender, e) => this.Show();
+            this.Hide();
             window.ShowDialog();
         }
 
-        private void URLbox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            this.URLbox.Text = "";
-        }
+        /// <summary>
+        /// A function which clears the URL in the input box when it gets focused.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void URLbox_GotFocus(object sender, RoutedEventArgs e) => this.URLbox.Text = "";
     }
 }
