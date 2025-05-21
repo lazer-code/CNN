@@ -140,7 +140,15 @@ namespace AircraftFrontend
                 client.Close();
                 server.Stop();
 
-                Dispatcher.Invoke(() => this.mediaElement.Source = new Uri(path));
+                try
+                {
+                    Dispatcher.Invoke(() => this.mediaElement.Source = new Uri(path));
+                }
+                catch (Exception ex)
+                {
+                    label.Content = "Invalid Path!";
+                }
+
             });
 
             thread.Start();

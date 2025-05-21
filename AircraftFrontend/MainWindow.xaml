@@ -33,7 +33,7 @@
 
                 <Button Content="Upload File" Style="{StaticResource RoundButtonStyle}" Margin="0,99,0,0" Click="Button_Click"/>
                 <Label Content="Welcome to AIRCRAFTDAR" Style="{StaticResource LabelStyle}" Foreground="Black" RenderTransformOrigin="0.433,0.901" Margin="0,26,0,0"/>
-                <Label Content="Upload image or video and scan for aircrafts" Style="{StaticResource LabelStyle}" Foreground="Black" RenderTransformOrigin="0.433,0.901" Margin="0,68,0,0" FontSize="12"/>
+                <Label Content="Upload an image or a video and scan for aircrafts" Style="{StaticResource LabelStyle}" Foreground="Black" RenderTransformOrigin="0.433,0.901" Margin="0,68,0,0" FontSize="12"/>
                 <TextBox Style="{StaticResource RoundTextBoxStyle}" Name="URLbox" Text="Enter URL" FontSize="24" Foreground="Black" Margin="0,148,0,0" GotFocus="URLbox_GotFocus"/>
                 <Button Content="Check Youtube" Style="{StaticResource RoundButtonStyle}" Margin="0,187,0,0" Click="Button_Click_1"/>
             </Grid>

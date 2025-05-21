@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
 
@@ -87,10 +88,11 @@ namespace AircraftFrontend
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             string url = URLbox.Text;
+            var pattern = @"^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$";
 
-            if (url == "")
+            if (!Regex.IsMatch(url, pattern, RegexOptions.IgnoreCase))
             {
-                MessageBox.Show("Please enter a URL.");
+                MessageBox.Show("Please enter a valid YouTube URL.");
                 return;
             }
 

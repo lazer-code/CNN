@@ -1,4 +1,4 @@
-import os, sys, cv2, re, yt_dlp, time, socket, glob, shutil
+import os, sys, cv2, re, yt_dlp, time, socket, glob, shutil, torch
 from ultralytics import YOLO
 
 def checkIfYoutube(sock: socket.socket, url: str, save_path="Videos"):
@@ -60,8 +60,10 @@ def main(path):
 
             model = YOLO(os.path.dirname(os.path.abspath(__file__)) + "\\best.pt")
 
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
             for frame_num, result in enumerate(model.predict(source=path, stream=True, save=True)):
-                sock.sendall(f"{frame_num + 1} out of {top} frames!".encode())
+                sock.sendall(f"Using {device}: {frame_num + 1} out of {top} frames!".encode())
 
             path = max((f for f in map(lambda f: os.path.join("runs/detect/predict", f), os.listdir("runs/detect/predict")) if os.path.isfile(f)), key=os.path.getmtime, default=None)
 
