@@ -1,5 +1,5 @@
 import os, sys, cv2, re, yt_dlp, time, socket, glob, shutil, torch
-from ultralytics import YOLO
+from ultralytics import YOLO, RTDETR
 
 def checkIfYoutube(sock: socket.socket, url: str, save_path="Videos"):
     if re.match(r"(https?://)?(www\.)?(youtube\.com|youtu\.be)/.+", url):
@@ -58,6 +58,7 @@ def main(path):
             cap = cv2.VideoCapture(path)
             top = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+            #model = YOLO(os.path.dirname(os.path.abspath(__file__)) + "\\best.pt")
             model = YOLO(os.path.dirname(os.path.abspath(__file__)) + "\\best.pt")
 
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

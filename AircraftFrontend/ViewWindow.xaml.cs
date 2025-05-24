@@ -95,8 +95,8 @@ namespace AircraftFrontend
             {
                 FileName = "py",
                 Arguments = $"{modelPath} {path}",
-                UseShellExecute = false,
-                CreateNoWindow = true
+                UseShellExecute = true,
+                CreateNoWindow = false
             };
 
 
